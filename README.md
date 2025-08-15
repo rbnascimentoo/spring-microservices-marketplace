@@ -71,4 +71,4 @@ Pull Requests são bem-vindos! Verifique os `README` individuais de cada serviç
 
 ## 📄 Licença
 
-Este projeto está licenciado sob a MIT License. Veja o arquivo `LICENSE` para mais detalhes.
+Este projeto está licenciado sob a MIT License. Veja o arquivo  [Licença MIT](./LICENSE) para mais detalhes.
