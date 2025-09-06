@@ -12,3 +12,5 @@ public interface ProductUseCase {
     boolean delete(Long id);
 }
 
+
+
