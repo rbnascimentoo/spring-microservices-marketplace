@@ -1,5 +1,13 @@
 version: '3.8'
 services:
+  config-server:
+    build: ./config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=https://github.com/rbnascimentoo/marketplace-configs
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL=main
+
   user-service:
     build: ./user-service
     ports:
@@ -10,6 +18,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
     depends_on:
       - user-db
+      - config-server
 
   user-db:
     image: postgres:15
@@ -30,6 +39,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
     depends_on:
       - product-db
+      - config-server
 
   product-db:
     image: postgres:15
@@ -50,6 +60,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
     depends_on:
       - order-db
+      - config-server
 
   order-db:
     image: postgres:15
@@ -68,6 +79,7 @@ services:
       - user-service
       - product-service
       - order-service
+      - config-server
 
   pgadmin:
       image: dpage/pgadmin4
@@ -80,3 +92,22 @@ services:
         - user-db
         - product-db
         - order-db
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/monitoring/prometheus.yml
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+      - api-gateway
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
