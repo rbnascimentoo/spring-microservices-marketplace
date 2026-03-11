@@ -1,113 +1,155 @@
-version: '3.8'
 services:
   config-server:
     build: ./config-server
     ports:
-      - "8888:8888"
+      - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
+    volumes:
+      - ./config:/config
     environment:
-      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=https://github.com/rbnascimentoo/marketplace-configs
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=file:/config
       - SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL=main
+    networks:
+      - marketplace-network
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - marketplace-network
 
   user-service:
     build: ./user-service
     ports:
-      - "8081:8080"
+      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/userdb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${POSTGRES_HOST}:5432/${USER_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:${CONFIG_SERVER_PORT}
     depends_on:
-      - user-db
+      - postgres
       - config-server
-
-  user-db:
-    image: postgres:15
-    environment:
-      - POSTGRES_DB=userdb
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5433:5432"
+    networks:
+      - marketplace-network
 
   product-service:
     build: ./product-service
     ports:
-      - "8082:8080"
+      - "${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://product-db:5432/productdb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${POSTGRES_HOST}:5432/${PRODUCT_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:${CONFIG_SERVER_PORT}
     depends_on:
-      - product-db
+      - postgres
       - config-server
-
-  product-db:
-    image: postgres:15
-    environment:
-      - POSTGRES_DB=productdb
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5434:5432"
+    networks:
+      - marketplace-network
 
   order-service:
     build: ./order-service
     ports:
-      - "8083:8080"
+      - "${ORDER_SERVICE_PORT}:${ORDER_SERVICE_PORT}"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://order-db:5432/orderdb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${POSTGRES_HOST}:5432/${ORDER_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:${CONFIG_SERVER_PORT}
     depends_on:
-      - order-db
+      - postgres
       - config-server
+    networks:
+      - marketplace-network
 
-  order-db:
-    image: postgres:15
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: start-dev
     environment:
-      - POSTGRES_DB=orderdb
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://${POSTGRES_HOST}:5432/${KEYCLOAK_DB}
+      - KC_DB_USERNAME=${POSTGRES_USER}
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
     ports:
-      - "5435:5432"
+      - "${KEYCLOAK_PORT}:8080"
+    depends_on:
+      - postgres
+    networks:
+      - marketplace-network
 
   api-gateway:
     build: ./api-gateway
     ports:
-      - "8080:8080"
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:${CONFIG_SERVER_PORT}
     depends_on:
       - user-service
       - product-service
       - order-service
       - config-server
+      - keycloak
+      - redis
+    networks:
+      - marketplace-network
 
-  pgadmin:
-      image: dpage/pgadmin4
-      environment:
-        - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-        - PGADMIN_DEFAULT_PASSWORD=admin
-      ports:
-        - "5050:80"
-      depends_on:
-        - user-db
-        - product-db
-        - order-db
+  redis:
+    image: redis:7
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - marketplace-network
 
   prometheus:
     image: prom/prometheus
     ports:
-      - "9090:9090"
+      - "${PROMETHEUS_PORT}:9090"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/monitoring/prometheus.yml
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
       - user-service
       - product-service
       - order-service
       - api-gateway
+      - keycloak
+    networks:
+      - marketplace-network
 
   grafana:
     image: grafana/grafana
     ports:
-      - "3000:3000"
+      - "${GRAFANA_PORT}:3000"
     depends_on:
       - prometheus
+    networks:
+      - marketplace-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "${PGADMIN_PORT}:80"
+    depends_on:
+      - postgres
+    networks:
+      - marketplace-network
+
+networks:
+  marketplace-network:
+    driver: bridge

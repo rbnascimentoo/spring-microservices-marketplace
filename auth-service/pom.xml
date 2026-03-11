@@ -8,11 +8,15 @@
 		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.rnascimento.marketplace</groupId>
-	<artifactId>auth-service</artifactId>
+	<groupId>io.github.rbnascimento.marketplace</groupId>
+	<artifactId>marketplace-auth-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>auth-service</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Marketplace Auth Service</name>
+	<description>
+		Authentication and authorization microservice for the Marketplace platform.
+		Responsible for integrating with Keycloak, validating access tokens and
+		providing authentication-related operations across the system.
+	</description>
 	<url/>
 	<licenses>
 		<license/>

@@ -8,11 +8,15 @@
 		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.rnascimento.marketplace</groupId>
-	<artifactId>notification-service</artifactId>
+	<groupId>io.github.rbnascimento.marketplace</groupId>
+	<artifactId>marketplace-notification-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>notification-service</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Marketplace Notification Service</name>
+	<description>
+		Microservice responsible for sending notifications within the
+		Marketplace platform, including email, messaging and event-driven
+		alerts for users and administrators.
+	</description>
 	<url/>
 	<licenses>
 		<license/>

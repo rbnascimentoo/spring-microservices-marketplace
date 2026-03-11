@@ -8,11 +8,15 @@
 		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.rnascimento.marketplace</groupId>
-	<artifactId>payment-service</artifactId>
+	<groupId>io.github.rbnascimento.marketplace</groupId>
+	<artifactId>marketplace-payment-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>payment-service</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Marketplace Payment Service</name>
+	<description>
+		Microservice responsible for payment processing and transaction
+		management in the Marketplace platform, integrating with external
+		payment providers.
+	</description>
 	<url/>
 	<licenses>
 		<license/>

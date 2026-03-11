@@ -8,11 +8,15 @@
 		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.rnascimento.marketplace</groupId>
-	<artifactId>order-service</artifactId>
+	<groupId>io.github.rbnascimento.marketplace</groupId>
+	<artifactId>marketplace-order-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>order-service</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Marketplace Order Service</name>
+	<description>
+		Microservice responsible for order management in the Marketplace
+		platform, handling order creation, status tracking and communication
+		with payment and product services.
+	</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -49,10 +53,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.micrometer</groupId>

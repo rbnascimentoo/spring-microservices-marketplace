@@ -1,0 +1,79 @@
+.gitignore
+
+# ========================
+# Environment variables
+# ========================
+.env
+.env-prod
+.env.local
+.env.*.local
+
+# ========================
+# IDE
+# ========================
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# ========================
+# Build
+# ========================
+target/
+build/
+out/
+
+# ========================
+# Logs
+# ========================
+logs/
+*.log
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Docker volumes / data
+# ========================
+postgres-data/
+redis-data/
+grafana-data/
+prometheus-data/
+
+# ========================
+# Config local
+# ========================
+config/
+
+# ========================
+# Maven wrapper logs
+# ========================
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# ========================
+# Spring Boot devtools
+# ========================
+.restart
+
+# ========================
+# Temporary files
+# ========================
+tmp/
+temp/
+
+# ========================
+# Test reports
+# ========================
+surefire-reports/
+failsafe-reports/
+
+# ========================
+# Coverage
+# ========================
+coverage/
+jacoco.exec

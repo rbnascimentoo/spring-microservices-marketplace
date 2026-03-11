@@ -8,11 +8,15 @@
 		<version>3.3.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.rnascimento.marketplace</groupId>
-	<artifactId>config-server</artifactId>
+	<groupId>io.github.rbnascimento.marketplace</groupId>
+	<artifactId>marketplace-config-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>config-server</name>
-	<description>Centralized Configuration Server for the Marketplace</description>
+	<name>Marketplace Config Server</name>
+	<description>
+		Centralized configuration server for the Marketplace platform.
+		Provides externalized configuration management for all microservices
+		using Spring Cloud Config.
+	</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -42,14 +46,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-config-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.micrometer</groupId>
