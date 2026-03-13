@@ -3,6 +3,11 @@ services:
     build: ./config-server
     ports:
       - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - ./config:/config
     environment:
@@ -20,6 +25,7 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
     networks:
       - marketplace-network
 
@@ -91,17 +97,25 @@ services:
   api-gateway:
     build: ./api-gateway
     ports:
-      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+      - "${API_GATEWAY_PORT}:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:${CONFIG_SERVER_PORT}
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
     depends_on:
-      - user-service
-      - product-service
-      - order-service
-      - config-server
-      - keycloak
-      - redis
+      config-server:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      keycloak:
+        condition: service_started
+      user-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+      order-service:
+        condition: service_started
     networks:
       - marketplace-network
 
@@ -121,11 +135,11 @@ services:
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
+      - api-gateway
+      - keycloak
       - user-service
       - product-service
       - order-service
-      - api-gateway
-      - keycloak
     networks:
       - marketplace-network
 
@@ -138,17 +152,17 @@ services:
     networks:
       - marketplace-network
 
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-    ports:
-      - "${PGADMIN_PORT}:80"
-    depends_on:
-      - postgres
-    networks:
-      - marketplace-network
+#  pgadmin:
+#    image: dpage/pgadmin4
+#    environment:
+#      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+#      - PGADMIN_DEFAULT_PASSWORD=admin
+#    ports:
+#      - "${PGADMIN_PORT}:80"
+#    depends_on:
+#      - postgres
+#    networks:
+#      - marketplace-network
 
 networks:
   marketplace-network:

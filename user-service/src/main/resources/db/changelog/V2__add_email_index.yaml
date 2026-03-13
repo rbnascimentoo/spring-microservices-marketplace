@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-email-lower-index
+      author: rafael nascimento
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_users_email_lower ON users (LOWER(email));

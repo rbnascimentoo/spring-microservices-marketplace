@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: rafael nascimento
+      changes:
+        - sqlFile:
+            path: db/changelog/V1__create_products_table.sql
+
+  - changeSet:
+      id: 2
+      author: rafael nascimento
+      changes:
+        - sqlFile:
+            path: db/changelog/V2__create_products_indexes.sql
+
+  - changeSet:
+      id: 3
+      author: rafael nascimento
+      changes:
+        - sqlFile:
+            path: db/changelog/V3__insert_initial_products.sql

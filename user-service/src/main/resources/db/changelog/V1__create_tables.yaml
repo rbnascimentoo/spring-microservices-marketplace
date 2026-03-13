@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-users-table
+      author: rafael nascimento
+      changes:
+        - sql:
+            sql: |
+              CREATE TABLE IF NOT EXISTS users (
+                id BIGSERIAL PRIMARY KEY,
+                name VARCHAR(255),
+                email VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255),
+                active BOOLEAN DEFAULT TRUE,
+                role VARCHAR(50),
+                created_at TIMESTAMP,
+                updated_at TIMESTAMP
+              );
